@@ -1,3 +1,4 @@
+from __future__ import print_function
 from urllib2 import urlopen
 import re
 import json
@@ -9,11 +10,11 @@ def lambda_handler(event, context):
                               {"recipe": recipe, "stage": "ingredients", "step_number": 0})
 
     elif event['request']['type'] == "IntentRequest" and event['request']['intent']['name'] == 'AMAZON.YesIntent':
-        return next_step(event['session'])
+        return next_step(event['session']['attributes'])
 
 def get_recipe(keyword):
     search_results = urlopen('http://www.taste.com.au/search-recipes/?q=beef+pie').read()
-    recipe_links = re.findall('(sort-by)|(http://www.taste.com.au/recipes/\d+)',s)
+    recipe_links = re.findall('(sort-by)|(http://www.taste.com.au/recipes/\d+)',search_results)
     results_index = recipe_links.index((u'sort-by', u'')) + 1 #skip the featured recipes
     recipe_link = recipe_links[results_index][1]
     recipe_page = urlopen(recipe_link).read()
@@ -21,6 +22,7 @@ def get_recipe(keyword):
     recipe = json.loads(recipe_json)
     #we want to make the recipe instructions one sentance each.
     recipe['recipeInstructions'] = [s for t in recipe['recipeInstructions'] for s in t.split('. ')]
+
     return recipe
 
 def next_step(state):
