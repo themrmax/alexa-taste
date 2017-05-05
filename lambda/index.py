@@ -15,7 +15,7 @@ def lambda_handler(event, context):
 def get_recipe(keyword):
     search_results = urlopen('http://www.taste.com.au/search-recipes/?q=beef+pie').read()
     # TODO remove duplicates from the following list
-    recipe_links = re.findall('/recipes/([a-z0-9\-]+/[a-z0-9\-]+)', search_results)
+    recipe_links = re.findall('/recipes/([a-z0-9\-]+/[A-Za-z0-9\-]+)', search_results)
     recipe_link = "http://www.taste.com.au/recipes/" + recipe_links[1]
     recipe_page = urlopen(recipe_link).read()
     recipe_json = re.search('({"recipeInstructions":.*)', recipe_page).group(1)
